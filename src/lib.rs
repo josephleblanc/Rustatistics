@@ -34,6 +34,14 @@ impl ExistingAggregate {
     }
 }
 
+pub fn mean_and_variance(data: &[f64]) -> Option<(f64, f64, f64)> {
+    let mut exag = ExistingAggregate::new();
+    for x in data {
+        exag.update(*x);
+    }
+    exag.finalize()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
