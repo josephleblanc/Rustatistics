@@ -3,9 +3,9 @@
 // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
 #[derive(Default)]
 pub struct ExistingAggregate {
-    pub count: f64,
-    pub mean: f64,
-    pub m2: f64,
+    pub count: f32,
+    pub mean: f32,
+    pub m2: f32,
 }
 
 impl ExistingAggregate {
@@ -13,7 +13,7 @@ impl ExistingAggregate {
         Default::default()
     }
 
-    pub fn update(&mut self, new_value: f64) -> &mut ExistingAggregate {
+    pub fn update(&mut self, new_value: f32) -> &mut ExistingAggregate {
         self.count += 1.0;
         let delta = new_value - self.mean;
         self.mean += delta / self.count;
@@ -22,7 +22,7 @@ impl ExistingAggregate {
         self
     }
 
-    pub fn finalize(&self) -> Option<(f64, f64, f64)> {
+    pub fn finalize(&self) -> Option<(f32, f32, f32)> {
         if self.count < 2.0 {
             None
         } else {
@@ -34,7 +34,7 @@ impl ExistingAggregate {
     }
 }
 
-pub fn mean_and_variance(data: &[f64]) -> Option<(f64, f64, f64)> {
+pub fn mean_and_variance(data: &[f32]) -> Option<(f32, f32, f32)> {
     let mut exag = ExistingAggregate::new();
     for x in data {
         exag.update(*x);
@@ -49,7 +49,8 @@ mod tests {
     fn small_simple_list() {
         let mut exag = ExistingAggregate::new();
         for x in 1..=9 {
-            exag.update(x.try_into().unwrap());
+            // potential problem at upper bounds during conversion from i32 to f32
+            exag.update(x as f32);
         }
         let (mean, variance, sample_variance) = exag.finalize().unwrap();
         assert_eq!(5.0, mean);
